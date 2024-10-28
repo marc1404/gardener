@@ -7,7 +7,7 @@ package controller
 import (
 	"context"
 	"fmt"
-
+	"github.com/gardener/gardener/pkg/gardenlet/controller/noob"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -128,6 +128,10 @@ func AddToManager(
 
 	if err := workloadidentity.AddToManager(mgr, seedCluster, gardenCluster, *cfg.Controllers.TokenRequestorWorkloadIdentity); err != nil {
 		return fmt.Errorf("failed adding TokenRequestorWorkloadIdentity controller: %w", err)
+	}
+
+	if err := noob.AddToManager(mgr, seedCluster, gardenCluster); err != nil {
+		return fmt.Errorf("failed adding Noob controller: %w", err)
 	}
 
 	return nil
