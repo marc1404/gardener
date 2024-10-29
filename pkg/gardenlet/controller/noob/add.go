@@ -8,7 +8,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -19,12 +18,7 @@ import (
 
 const ControllerName = "noob"
 
-func AddToManager(mgr manager.Manager, seedCluster, gardenCluster cluster.Cluster) error {
-	r := &Reconciler{
-		SeedClient:   seedCluster.GetClient(),
-		GardenClient: gardenCluster.GetClient(),
-	}
-
+func (r *Reconciler) AddToManager(mgr manager.Manager) error {
 	return builder.
 		ControllerManagedBy(mgr).
 		Named(ControllerName).
@@ -39,7 +33,7 @@ func AddToManager(mgr manager.Manager, seedCluster, gardenCluster cluster.Cluste
 			},
 		}).
 		WatchesRawSource(
-			source.Kind[client.Object](gardenCluster.GetCache(),
+			source.Kind[client.Object](r.GardenClusterCache,
 				&gardencorev1beta1.Shoot{}, watchHandler()),
 		).
 		Complete(r)

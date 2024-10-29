@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
-	v1beta1constants "github.com/gardener/gardener/pkg/apis/core/v1beta1/constants"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -15,8 +15,10 @@ import (
 )
 
 type Reconciler struct {
-	SeedClient   client.Client
-	GardenClient client.Client
+	SeedClient         client.Client
+	GardenClient       client.Client
+	GardenClusterCache cache.Cache
+	GardenNamespace    string
 }
 
 func (r *Reconciler) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
@@ -33,7 +35,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, request reconcile.Request) (
 
 	configMap := &corev1.ConfigMap{}
 	configMapName := types.NamespacedName{
-		Namespace: v1beta1constants.GardenNamespace,
+		Namespace: r.GardenNamespace,
 		Name:      fmt.Sprintf("shoot-protocol--%v--%v", shoot.Namespace, shoot.Name),
 	}
 	configMapIsFound := true
@@ -94,7 +96,7 @@ func (r *Reconciler) resolveShoot(ctx context.Context, request reconcile.Request
 
 func getShootNamespacedNameFromConfigMapName(configMapName string) *types.NamespacedName {
 	parts := strings.Split(configMapName, "--")
-	if len(parts) < 3 {
+	if len(parts) != 3 {
 		return nil
 	}
 

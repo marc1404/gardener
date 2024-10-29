@@ -130,7 +130,12 @@ func AddToManager(
 		return fmt.Errorf("failed adding TokenRequestorWorkloadIdentity controller: %w", err)
 	}
 
-	if err := noob.AddToManager(mgr, seedCluster, gardenCluster); err != nil {
+	if err := (&noob.Reconciler{
+		SeedClient:         seedCluster.GetClient(),
+		GardenClient:       gardenCluster.GetClient(),
+		GardenClusterCache: gardenCluster.GetCache(),
+		GardenNamespace:    v1beta1constants.GardenNamespace,
+	}).AddToManager(mgr); err != nil {
 		return fmt.Errorf("failed adding Noob controller: %w", err)
 	}
 
