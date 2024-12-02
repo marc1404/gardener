@@ -95,8 +95,23 @@
       ],
       datasourceTemplate: 'docker',
     },
+    {
+      // Generic detection of container images in imagevector via container registry.
+      customType: 'regex',
+      fileMatch: ['{{arg0}}'],
+      matchStrings: ['\\s+repository:\\s+(?<depName>.*?)\\n\\s+tag:\\s+"?(?<currentValue>.*?)"?\\n'],
+      datasourceTemplate: 'docker',
+    },
+    {
+      // Generic detection of container images in imagevector via github releases.
+      customType: 'regex',
+      fileMatch: ['{{arg0}}'],
+      matchStrings: ['\\s+sourceRepository:\\s+github.com\/(?<depName>.*?)\\n\\s+repository:\\s+.*\\n\\s+tag:\\s+"?(?<currentValue>.*?)"?\\n'],
+      datasourceTemplate: 'github-releases',
+    },
   ],
   separateMinorPatch: true,
+
   packageRules: [
     {
       // Run make generate when Go API packages have been changed because CRDs might have changed.
