@@ -72,7 +72,7 @@ require (
 	k8s.io/kube-aggregator v0.31.5
 	k8s.io/kube-openapi v0.0.0-20241127205056-99599406b04f
 	k8s.io/kube-proxy v0.31.5
-	k8s.io/kube-state-metrics/v2 v2.13.0
+	k8s.io/kube-state-metrics/v2 v2.15.0
 	k8s.io/kubelet v0.31.5
 	k8s.io/metrics v0.31.5
 	k8s.io/pod-security-admission v0.31.5
