@@ -439,7 +439,13 @@
         'minor',
         'patch',
       ],
-      prFooter: "**Release note**:\n```other dependency\nThe following dependencies have been updated:\n{{#each (distinct upgrades) as |upgrade|}}\n- `{{upgrade.depName}}` from `{{upgrade.currentVersion}}` to `{{upgrade.newVersion}}`. {{#if (equals upgrade.datasource 'github-releases')}}[Release Notes](https://github.com/{{upgrade.depName}}/releases/tag/{{upgrade.newVersion}}){{/if}}\n{{/each}}\n```",
+      prFooter: "**Release note**:\
+```other dependency\
+The following dependencies have been updated:\
+{{#each upgrades as |upgrade|}}\
+- `{{upgrade.depName}}` from `{{upgrade.currentVersion}}` to `{{upgrade.newVersion}}`. {{#if (equals upgrade.datasource 'github-releases')}}[Release Notes](https://github.com/{{upgrade.depName}}/releases/tag/{{upgrade.newVersion}}){{/if}}\
+{{/each}}\
+```",
     },
   ],
 }
