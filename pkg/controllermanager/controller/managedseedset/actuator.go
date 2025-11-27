@@ -154,8 +154,8 @@ func (a *actuator) Reconcile(ctx context.Context, log logr.Logger, managedSeedSe
 		return status, false, nil
 	}
 
-	// Reconcile postponed replicas
-	for _, r := range postponedReplicas {
+	// Reconcile postponed and ready replicas
+	for _, r := range append(postponedReplicas, readyReplicas...) {
 		if pending, err := a.reconcileReplica(ctx, log, managedSeedSet, status, r, scalingIn); err != nil || pending {
 			return status, false, err
 		}
