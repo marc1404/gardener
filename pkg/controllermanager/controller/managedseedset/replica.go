@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gardener/gardener/pkg/controllerutils"
+	"github.com/go-logr/logr"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -96,6 +98,7 @@ type Replica interface {
 	IsDeletable() bool
 	// CreateShoot initializes this replica's shoot and then creates it using the given context and client.
 	CreateShoot(ctx context.Context, c client.Client, ordinal int32) error
+	UpdateShoot(ctx context.Context, log logr.Logger, c client.Client, ordinal int32, mss *seedmanagementv1alpha1.ManagedSeedSet) error
 	// CreateManagedSeed initializes this replica's managed seed, and then creates it using the given context and client.
 	CreateManagedSeed(ctx context.Context, c client.Client) error
 	// DeleteShoot deletes this replica's shoot using the given context and client.
@@ -245,6 +248,17 @@ func (r *replica) CreateShoot(ctx context.Context, c client.Client, ordinal int3
 		return client.IgnoreAlreadyExists(c.Create(ctx, r.shoot))
 	}
 	return nil
+}
+
+func (r *replica) UpdateShoot(ctx context.Context, log logr.Logger, c client.Client, ordinal int32, mss *seedmanagementv1alpha1.ManagedSeedSet) error {
+	log.Info("Updating shoot", "shoot", r.shoot)
+	if r.shoot == nil {
+		return nil
+	}
+	shoot := newShoot(mss, ordinal)
+	res, err := controllerutils.GetAndCreateOrStrategicMergePatch(ctx, c, shoot, func() error { return nil }, controllerutils.SkipEmptyPatch{})
+	log.Info("Shoot update result", "result", res, "error", err)
+	return err
 }
 
 // CreateManagedSeed initializes this replica's managed seed, and then creates it using the given context and client.

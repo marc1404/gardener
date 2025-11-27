@@ -192,6 +192,10 @@ func (a *actuator) reconcileReplica(
 	r Replica,
 	scalingIn bool,
 ) (bool, error) {
+	if err := r.UpdateShoot(ctx, log, a.gardenClient, r.GetOrdinal(), managedSeedSet); err != nil {
+		return false, err
+	}
+
 	replicaStatus := r.GetStatus()
 	log = log.WithValues("replica", r.GetObjectKey())
 
