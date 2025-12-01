@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gardener/gardener/pkg/controllerutils"
 	"github.com/go-logr/logr"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
@@ -254,19 +255,15 @@ func (r *replica) UpdateShoot(ctx context.Context, log logr.Logger, c client.Cli
 	if r.shoot == nil {
 		return nil
 	}
-	shoot := &gardencorev1beta1.Shoot{}
-	if err := c.Get(ctx, client.ObjectKeyFromObject(r.shoot), shoot); err != nil {
-		log.Error(err, "failed to get shoot", "shoot", r.shoot)
-		return err
-	}
-	patch := client.MergeFrom(shoot.DeepCopy())
-	shoot.Labels = mss.Spec.ShootTemplate.Labels
-
-	if err := c.Patch(ctx, shoot, patch); err != nil {
-		log.Error(err, "failed to update shoot", "shoot", r.shoot)
-		return err
-	}
-	return nil
+	shoot := newShoot(mss, ordinal)
+	res, err := controllerutils.GetAndCreateOrStrategicMergePatch(ctx, c, shoot, func() error {
+		log.Info("shoot before mutate", shoot)
+		newShoot(mss, ordinal).DeepCopyInto(shoot)
+		log.Info("shoot after mutate", shoot)
+		return nil
+	}, controllerutils.SkipEmptyPatch{})
+	log.Info("Updated shoot", "shoot", r.shoot, "result", res)
+	return err
 }
 
 // CreateManagedSeed initializes this replica's managed seed, and then creates it using the given context and client.
