@@ -559,7 +559,6 @@ The following dependencies have been updated:\n\
       description: 'Adds a PR body note for images that depend on ci-infra PRs.',
       matchManagers: ['regex'],
       matchDatasources: ['docker', 'github-releases'],
-      matchSourceUrls: ['europe-docker.pkg.dev/gardener-project/releases/3rd/**'],
       matchPackageNames: [
         'credativ/plutono',
         'credativ/vali',
