@@ -60,7 +60,6 @@ require (
 	gonum.org/v1/gonum v0.16.0
 	google.golang.org/protobuf v1.36.10
 	helm.sh/helm/v3 v3.18.6
-	helm.sh/helm/v4 v4.0.4
 	istio.io/api v1.27.4
 	istio.io/client-go v1.27.2
 	k8s.io/api v0.34.3
